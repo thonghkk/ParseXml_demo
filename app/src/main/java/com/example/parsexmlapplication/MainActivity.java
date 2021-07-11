@@ -24,8 +24,6 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView txtName;
-    private TextView txtAge;
     private ListView listViewParse;
 
     @Override
@@ -36,43 +34,68 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             parseXml();
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (XmlPullParserException | IOException e) {
             e.printStackTrace();
         }
-
     }
 
     private void initView() {
-        txtName = findViewById(R.id.txtName);
-        txtAge = findViewById(R.id.txtAge);
+        TextView txtName = findViewById(R.id.txtName);
+        TextView txtAge = findViewById(R.id.txtAge);
+        /**
+         * declaring the listView from the layout file
+         * */
         listViewParse = findViewById(R.id.listViewParseXml);
     }
 
     private void parseXml() throws XmlPullParserException, IOException {
-
+        /**
+         * input stream the data.xml file
+         * */
         InputStream isStream = getAssets().open("data.xml");
 
+        /**
+         * create a XmlPull parse Factory instance
+         * */
         XmlPullParserFactory parserFactory = XmlPullParserFactory.newInstance();
         XmlPullParser parser = parserFactory.newPullParser();
 
+        /**
+         *setting the spaceName feature to false
+         * */
         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-
+        /**
+         * working with the input stream
+         * */
         parser.setInput(isStream, null);
 
         setData(parser);
     }
 
     private void setData(XmlPullParser parser) throws XmlPullParserException, IOException {
+        /**
+         * creating a user list string hash map with array list
+         * */
         ArrayList<HashMap<String, String>> userList = new ArrayList<>();
+        /**
+         * creating a user string hashMap
+         * */
         HashMap user = new HashMap<String, String>();
+        /**
+         * set event Type
+         * */
         int event = parser.getEventType();
         String tag = "";
         String text = null;
 
         while (event != XmlPullParser.END_DOCUMENT) {
+            /**
+             * assign tag to name of parse data
+             * */
             tag = parser.getName();
+            /**
+             * catch event to handling
+             * */
             switch (event) {
                 case XmlPullParser.START_TAG:
                     if (tag.equals("user")) user = new HashMap();
@@ -94,15 +117,24 @@ public class MainActivity extends AppCompatActivity {
                     }
                     break;
             }
+            /**
+             * jump to data of parse next
+             * */
             event = parser.next();
         }
         printUser(userList);
     }
 
     public void printUser(ArrayList<HashMap<String, String>> users) {
+        /**
+         * declaring a SimpleAdapter to adapter
+         * */
         String[] arr = {"name", "age"};
         int[] arrView = {R.id.txtName, R.id.txtAge};
         SimpleAdapter adapter = new SimpleAdapter(this, users, R.layout.item_parse_xml, arr, arrView);
+        /**
+         * assign SimpleAdapter for listView to show out data
+         * */
         listViewParse.setAdapter(adapter);
     }
 }
